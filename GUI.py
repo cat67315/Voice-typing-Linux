@@ -1,21 +1,41 @@
 ##!/usr/bin/env python3
 
+# It is recomended to bind this script to a keyboard shortcut.
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from dark_mode_detect import is_dark_mode
 import subprocess, sys
+
+force_dark_mode = False  # Set to True to force dark mode
+force_light_mode = False  # Set to True to force light mode
+
+is_dark_mode_real = is_dark_mode
+
+
+if force_dark_mode:
+    is_dark_mode_real = True
+elif force_light_mode:
+    is_dark_mode_real = False
+
 
 class DraggableWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("My GUI")
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowTitle("Voice Typing Linux GUI")
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no title bar
         self.setFixedSize(100, 50)  # non-resizable
-        self.setStyleSheet("background-color: #2e2e2e; border: 2px solid #555; border-radius: 10px;")
-
+        if is_dark_mode_real:
+            self.setStyleSheet("background-color: #2e2e2e; border: 2px solid #555; border-radius: 10px;")
+        else:
+            self.setStyleSheet("background-color: #f2f2f2; border: 2px solid #aaa; border-radius: 10px;")
         layout = QVBoxLayout()
         self.button = QPushButton()
-        self.button.setIcon(QIcon("assets/mic_icon.png"))
+        if is_dark_mode_real:
+            self.button.setIcon(QIcon("assets/mic_icon_white.png"))
+        else:
+            self.button.setIcon(QIcon("assets/mic_icon_black.png"))
         self.button.setStyleSheet("QPushButton { padding: 10px; font-size: 16px; }")
         self.button.clicked.connect(self.run_script)
         layout.addWidget(self.button)

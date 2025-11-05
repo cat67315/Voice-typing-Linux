@@ -1,17 +1,31 @@
 ##!/usr/bin/env python3
 
-# It is recomended to bind this script to a keyboard shortcut.
+# It is recomended to bind this script to a keybind (I recommend Host+H).
+# If you have any other hotkeys binded to the hotkey you choose, unbind them or set them to a different hotkey.
+# Lookup how to set custom keybinds for your linux distro.
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from dark_mode_detect import is_dark_mode
+from linuxosinfo import is_dark_mode, os_color
 import subprocess, sys
+import json5
 
-force_dark_mode = False  # Set to True to force dark mode
-force_light_mode = False  # Set to True to force light mode
+# Load and apply config
+with open("config.json5", "r", encoding="utf-8") as f:
+    config = json5.load(f)
 
-is_dark_mode_real = is_dark_mode
+force_dark_mode = config["Force dark mode"]
+force_light_mode = config["Force light mode"]
+window_width = config["Window width"]
+window_height = config["Window height"]
+background_color_dark = config["Background color dark mode"]
+background_color_light = config["Background color light mode"]
+button_border_color_dark = config["Button Border color dark mode"]
+button_border_color_light = config["Button Border color light mode"]
+button_border_thickness = config["Button Border thickness"]
+
+is_dark_mode_real = is_dark_mode()
 
 
 if force_dark_mode:
@@ -25,11 +39,11 @@ class DraggableWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Voice Typing Linux GUI")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no title bar
-        self.setFixedSize(100, 50)  # non-resizable
+        self.setFixedSize(window_width, window_height)  # non-resizable
         if is_dark_mode_real:
-            self.setStyleSheet("background-color: #2e2e2e; border: 2px solid #555; border-radius: 10px;")
+            self.setStyleSheet(f"background-color: {background_color_dark}; border: 2px solid {button_border_color_dark}; border-radius: {button_border_thickness}px;")
         else:
-            self.setStyleSheet("background-color: #f2f2f2; border: 2px solid #aaa; border-radius: 10px;")
+            self.setStyleSheet(f"background-color: {background_color_light}; border: 2px solid {button_border_color_light}; border-radius: {button_border_thickness}px;")
         layout = QVBoxLayout()
         self.button = QPushButton()
         if is_dark_mode_real:

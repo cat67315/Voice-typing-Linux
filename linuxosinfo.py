@@ -5,7 +5,7 @@ import subprocess
 import configparser
 
 def is_dark_mode():
-    # 1. GNOME
+    # GNOME
     try:
         theme = subprocess.check_output(
             ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
@@ -16,7 +16,7 @@ def is_dark_mode():
     except Exception:
         pass
 
-    # 2. KDE Plasma
+    # KDE Plasma
     kde_config_path = os.path.expanduser("~/.config/kdeglobals")
     if os.path.exists(kde_config_path):
         config = configparser.ConfigParser()
@@ -28,7 +28,7 @@ def is_dark_mode():
         except Exception:
             pass
 
-    # 3. XFCE
+    # XFCE
     try:
         xfce_theme = subprocess.check_output(
             ["xfconf-query", "-c", "xsettings", "-p", "/Net/ThemeName"],
@@ -39,7 +39,7 @@ def is_dark_mode():
     except Exception:
         pass
 
-    # 4. Cinnamon
+    # Cinnamon
     try:
         cinnamon_theme = subprocess.check_output(
             ["gsettings", "get", "org.cinnamon.desktop.interface", "gtk-theme"],
@@ -50,7 +50,7 @@ def is_dark_mode():
     except Exception:
         pass
 
-    # 5. MATE
+    # MATE
     try:
         mate_theme = subprocess.check_output(
             ["gsettings", "get", "org.mate.interface", "gtk-theme"],
@@ -62,3 +62,6 @@ def is_dark_mode():
         pass
 
     return False
+
+def os_color():
+    return 1 # Temporary placeholder

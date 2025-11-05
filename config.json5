@@ -1,0 +1,11 @@
+{
+    "Force dark mode": false, // Set to true to force dark mode
+    "Force light mode": false, // Set to true to force light mode
+    "Window width": 100, // Width of the GUI window in pixels
+    "Window height": 50, // Height of the GUI window in pixels
+    "Background color dark mode": "#2e2e2e", // Background color in hex for dark mode
+    "Background color light mode": "#f2f2f2", // Background color in hex for light mode
+    "Button Border color dark mode": "#555", // Border color in hex for dark mode
+    "Button Border color light mode": "#aaa", // Border color in hex for light mode
+    "Button Border thickness": 10, // Thickness of the button border in pixels
+}

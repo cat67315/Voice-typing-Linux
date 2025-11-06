@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Check if pip3 is installed
-if command -v pip3 >/dev/null 2>&1; then
-    echo "pip3 is installed"
-else
+if not command -v pip3 >/dev/null 2>&1; then
     echo "pip3 is not installed. Installing pip3..."
     # Checks for package managers and installs pip3 accordingly
     if command -v apt >/dev/null 2>&1; then

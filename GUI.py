@@ -24,6 +24,7 @@ background_color_light = config["Background color light mode"]
 button_border_color_dark = config["Button Border color dark mode"]
 button_border_color_light = config["Button Border color light mode"]
 button_border_thickness = config["Button Border thickness"]
+window_movable = config["Window movable"]
 
 is_dark_mode_real = is_dark_mode()
 
@@ -60,19 +61,20 @@ class DraggableWindow(QWidget):
     def run_script(self):
         subprocess.Popen([sys.executable, "yourscript.py"])
 
-    # Mouse events for dragging
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.old_pos = event.globalPosition().toPoint()
+    if window_movable:
+        # Mouse events for dragging
+        def mousePressEvent(self, event):
+            if event.button() == Qt.LeftButton:
+                self.old_pos = event.globalPosition().toPoint()
 
-    def mouseMoveEvent(self, event):
-        if self.old_pos is not None:
-            delta = event.globalPosition().toPoint() - self.old_pos
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.old_pos = event.globalPosition().toPoint()
+        def mouseMoveEvent(self, event):
+            if self.old_pos is not None:
+                delta = event.globalPosition().toPoint() - self.old_pos
+                self.move(self.x() + delta.x(), self.y() + delta.y())
+                self.old_pos = event.globalPosition().toPoint()
 
-    def mouseReleaseEvent(self, event):
-        self.old_pos = None
+        def mouseReleaseEvent(self, event):
+            self.old_pos = None
 
 
 app = QApplication([])

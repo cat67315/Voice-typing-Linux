@@ -8,4 +8,5 @@
     "Button Border color dark mode": "#555", // Border color in hex for dark mode
     "Button Border color light mode": "#aaa", // Border color in hex for light mode
     "Button Border thickness": 10, // Thickness of the button border in pixels
+    "Window movable": true, // Set to false to disable moving the window
 }

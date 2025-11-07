@@ -1,4 +1,4 @@
-##!/usr/bin/env python3
+#!/usr/bin/env python3
 
 # It is recomended to bind this script to a keybind (I recommend Host+H).
 # If you have any other hotkeys binded to the hotkey you choose, unbind them or set them to a different hotkey.

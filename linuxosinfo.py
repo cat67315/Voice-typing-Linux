@@ -63,5 +63,5 @@ def is_dark_mode():
 
     return False
 
-def os_color():
-    return 1 # Temporary placeholder
+def os_accent_color():
+    return 1,4,7 # Temporary placeholder

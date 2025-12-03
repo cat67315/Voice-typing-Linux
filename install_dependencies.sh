@@ -19,36 +19,37 @@ if ! command -v pip3 >/dev/null 2>&1; then
     fi
 fi
 
-# Check if venv is instaled
-python3 -m venv venvtest
-if [ $? -eq 0 ] && [ -d "venvtest" ]; then
-    rm -rf testvenv
-else
-    echo "Venv is not installed. Installing venv..."
-    if command -v apt >/dev/null 2>&1; then
-        sudo apt update
-        sudo apt install python3-venv
-    elif command -v dnf >/dev/null 2>&1; then
-        sudo dnf check-update
-        sudo dnf install python3-venv
-    elif command -v pacman >/dev/null 2>&1; then
-        echo Warning: Since you are on arch/manjaro venv is not a thing. It will use virtualenv as a substatute but I do not use arch/manjaro so I do not know if it will work properly.
-        read -p "Press [Enter] to continue or ^C to quit"
-        sudo pacman -Syu
-        sudo pacman -S python-virtualenv
+# Check if venv is instaled and create a virtual environment if present
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+    if [ $? -eq 0 ] && [ -d "venv" ]; then
+        echo "Venv successfully created."
     else
-        echo "No supported package manager found. Please install venv manually then rerun"
-        exit 1
+       echo "Venv is not installed. Installing venv..."
+        if command -v apt >/dev/null 2>&1; then
+            sudo apt update
+            sudo apt install python3-venv
+        elif command -v dnf >/dev/null 2>&1; then
+            sudo dnf check-update
+            sudo dnf install python3-venv
+        elif command -v pacman >/dev/null 2>&1; then
+            echo "ERROR: Venv is not instaled but shoud be included with python package in pacman based distros. I onstly dont even know what to do here. Maby try reinstaling python?"
+            exit 1
+        else
+            echo "No supported package manager found. Please install venv manually then rerun"
+            exit 1
+        fi
+        # Try to create the virtual environment again
+        python3 -m venv venv
+        if [ $? -eq 0 ] && [ -d "venv" ]; then
+            echo "Venv successfully created."
+        else
+            echo "Failed to create virtual environment even after installing venv. Please check your Python installation."
+            exit 1
     fi
 fi
 
-
 # Install required Python packages inside a virtual environment
-
-if [ ! -d "venv" ]; then
-    python3 -m venv venv
-fi
-
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt

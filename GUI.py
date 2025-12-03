@@ -8,8 +8,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from linuxosinfo import is_dark_mode # Note: This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
-import subprocess, sys
+import subprocess
 import json5
+import os
 
 # Load and apply config
 with open("config.json5", "r", encoding="utf-8") as f:
@@ -59,7 +60,9 @@ class DraggableWindow(QWidget):
         self.old_pos = None
 
     def run_script(self):
-        subprocess.Popen([sys.executable, "yourscript.py"])
+        
+        os.environ["vosk_model_dir"] = "Vosk"
+        subprocess.run(["./nerd-dictation", "begin"], cwd="nerd-dictation")
 
     if window_movable:
         # Mouse events for dragging

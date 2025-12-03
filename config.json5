@@ -9,4 +9,5 @@
     "Button Border color light mode": "#aaa", // Border color in hex for light mode
     "Button Border thickness": 10, // Thickness of the button border in pixels
     "Window movable": true, // Set to false to disable moving the window
+    "Use punctuation model": false, // Set to true to use a model with punctuation (assumes you have downloaded it and put it in the Punctuation models diriectory)
 }

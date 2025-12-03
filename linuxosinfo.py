@@ -62,6 +62,3 @@ def is_dark_mode():
         pass
 
     return False
-
-def os_accent_color():
-    return 1,4,7 # Temporary placeholder

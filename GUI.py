@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-# It is recomended to bind this script to a keybind (I recommend Host+H).
+# It is recommend to bind this script to a keybind (I recommend Host+H).
 # If you have any other hotkeys binded to the hotkey you choose, unbind them or set them to a different hotkey.
-# Lookup how to set custom keybinds for your linux distro.
+# Lookup how to set custom keybinds for your linux distro. 
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from linuxosinfo import is_dark_mode, os_color
+from linuxosinfo import is_dark_mode # Note: This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
 import subprocess, sys
 import json5
 

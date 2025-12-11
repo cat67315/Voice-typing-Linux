@@ -46,6 +46,7 @@ if [ ! -d "venv" ]; then
         else
             echo "Failed to create virtual environment even after installing venv. Please check your Python installation."
             exit 1
+        fi
     fi
 fi
 

@@ -27,7 +27,7 @@ button_border_color_light = config["Button Border color light mode"]
 button_border_thickness = config["Button Border thickness"]
 window_movable = config["Window movable"]
 
-is_dark_mode_real = is_dark_mode()
+is_dark_mode_real = is_dark_mode() # I know, realy jank
 
 
 if force_dark_mode:
@@ -35,12 +35,21 @@ if force_dark_mode:
 elif force_light_mode:
     is_dark_mode_real = False
 
+session_type = (
+    "Wayland" if os.getenv("WAYLAND_DISPLAY") else
+    "X11"     if os.getenv("DISPLAY") else
+    "unknown"
+)
+print(f"Session type detected: {session_type}")
 
 class DraggableWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Voice Typing Linux GUI")
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no title bar
+        if session_type == "Wayland":
+            self.setWindowFlags(Qt.WindowStaysOnTopHint) # Always on top (Draging is broken with wayland so we only remove title bar on x11)
+        else:
+            self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no tile bar
         self.setFixedSize(window_width, window_height)  # non-resizable
         if is_dark_mode_real:
             self.setStyleSheet(f"background-color: {background_color_dark}; border: 2px solid {button_border_color_dark}; border-radius: {button_border_thickness}px;")
@@ -60,9 +69,17 @@ class DraggableWindow(QWidget):
         self.old_pos = None
 
     def run_script(self):
+        # Get absolute path to the workspace root
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        if config["Use punctuation model"]:
+            vosk_model_path = os.path.join(script_dir, "Vosk", "Punctuation models")
+        else:
+            vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
         
-        os.environ["vosk_model_dir"] = "Vosk"
-        subprocess.run(["./nerd-dictation", "begin"], cwd="nerd-dictation")
+        os.environ["vosk_model_dir"] = vosk_model_path
+        print(os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22") + "ruhrggfjnfgfhtrefgtjrfvguyrhfjdvihuytjrfkoiguhty")
+        subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
 
     if window_movable:
         # Mouse events for dragging

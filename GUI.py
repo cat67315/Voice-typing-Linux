@@ -4,13 +4,9 @@
 # If you have any other hotkeys binded to the hotkey you choose, unbind them or set them to a different hotkey.
 # Lookup how to set custom keybinds for your linux distro. 
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from linuxosinfo import is_dark_mode # Note: This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
-import subprocess
-import json5
+# Import pre modules
 import os
+import json5
 
 # Load and apply config
 with open("config.json5", "r", encoding="utf-8") as f:
@@ -27,8 +23,18 @@ button_border_color_light = config["Button Border color light mode"]
 button_border_thickness = config["Button Border thickness"]
 window_movable = config["Window movable"]
 
-is_dark_mode_real = is_dark_mode() # I know, realy jank
+if config["Force X11 backend"]:
+    os.environ["QT_QPA_PLATFORM"] = "xcb"
+    print("Forcing X11 backend for QT")
 
+# Import rest of modules
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from linuxosinfo import is_dark_mode # Note: This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
+import subprocess
+
+is_dark_mode_real = is_dark_mode() # I know, realy jank
 
 if force_dark_mode:
     is_dark_mode_real = True
@@ -36,7 +42,7 @@ elif force_light_mode:
     is_dark_mode_real = False
 
 session_type = (
-    "Wayland" if os.getenv("WAYLAND_DISPLAY") else
+    "Wayland" if os.getenv("WAYLAND_DISPLAY") and config["Force X11 backend"] == False else
     "X11"     if os.getenv("DISPLAY") else
     "unknown"
 )
@@ -81,7 +87,7 @@ class DraggableWindow(QWidget):
         print(os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22") + "ruhrggfjnfgfhtrefgtjrfvguyrhfjdvihuytjrfkoiguhty")
         subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
 
-    if window_movable:
+    if window_movable and session_type != "Wayland":
         # Mouse events for dragging
         def mousePressEvent(self, event):
             if event.button() == Qt.LeftButton:

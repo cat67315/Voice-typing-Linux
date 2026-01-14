@@ -12,6 +12,7 @@ import json5
 with open("config.json5", "r", encoding="utf-8") as f:
     config = json5.load(f)
 
+# Note: in the future, make the config checks hapen on the exicuting line of code, not here. 
 force_dark_mode = config["Force dark mode"]
 force_light_mode = config["Force light mode"]
 window_width = config["Window width"]
@@ -31,7 +32,7 @@ if config["Force X11 backend"]:
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from linuxosinfo import is_dark_mode # Note: This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
+from linuxosinfo import is_dark_mode # This module does not work on some desktops. If it dosint work for you go into config.json5 and turn Force dark mode to true
 import subprocess
 
 is_dark_mode_real = is_dark_mode() # I know, realy jank
@@ -46,14 +47,14 @@ session_type = (
     "X11"     if os.getenv("DISPLAY") else
     "unknown"
 )
-print(f"Session type detected: {session_type}")
+print(f"Session type: {session_type}")
 
 class DraggableWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Voice Typing Linux GUI")
         if session_type == "Wayland":
-            self.setWindowFlags(Qt.WindowStaysOnTopHint) # Always on top (Draging is broken with wayland so we only remove title bar on x11)
+            self.setWindowFlags(Qt.WindowStaysOnTopHint) # Always on top (Dragging is broken with wayland so we have the title bar on wayland)
         else:
             self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no tile bar
         self.setFixedSize(window_width, window_height)  # non-resizable
@@ -64,9 +65,9 @@ class DraggableWindow(QWidget):
         layout = QVBoxLayout()
         self.button = QPushButton()
         if is_dark_mode_real:
-            self.button.setIcon(QIcon("assets/mic_icon_white.png"))
+            self.button.setIcon(QIcon("assets/mic_icon_white.png")) # Note: In the future, use SVG icons so they scale better
         else:
-            self.button.setIcon(QIcon("assets/mic_icon_black.png"))
+            self.button.setIcon(QIcon("assets/mic_icon_black.png")) # Note: In the future, use SVG icons so they scale better
         self.button.setStyleSheet("QPushButton { padding: 10px; font-size: 16px; }")
         self.button.clicked.connect(self.run_script)
         layout.addWidget(self.button)
@@ -84,7 +85,7 @@ class DraggableWindow(QWidget):
             vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
         
         os.environ["vosk_model_dir"] = vosk_model_path
-        print(os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22") + "ruhrggfjnfgfhtrefgtjrfvguyrhfjdvihuytjrfkoiguhty")
+        print(os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22") + "ruhrggfjnfgfhtrefgtjrfvguyrhfjdvihuytjrfkoiguhty") # Temp line
         subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
 
     if window_movable and session_type != "Wayland":

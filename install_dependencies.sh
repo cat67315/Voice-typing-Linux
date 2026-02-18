@@ -20,9 +20,9 @@ if ! command -v pip3 >/dev/null 2>&1; then
 fi
 
 # Check if venv is instaled and create a virtual environment if present
-if [ ! -d "venv" ]; then
-    python3 -m venv venv
-    if [ $? -eq 0 ] && [ -d "venv" ]; then
+if [ ! -d ".venv" ]; then
+    python3 -m venv .venv
+    if [ $? -eq 0 ] && [ -d ".venv" ]; then
         echo "Venv successfully created."
     else
        echo "Venv is not installed. Installing venv..."
@@ -33,15 +33,15 @@ if [ ! -d "venv" ]; then
             sudo dnf check-update
             sudo dnf install python3-venv
         elif command -v pacman >/dev/null 2>&1; then
-            echo "ERROR: Venv is not instaled but shoud be included with python package in pacman based distros. I onstly dont even know what to do here. Maby try reinstaling python?"
+            echo "ERROR: Venv is not instaled but shoud be included with python package in arch based distros. I onstly dont even know what to do here. Maby try reinstaling python?"
             exit 1
         else
             echo "No supported package manager found. Please install venv manually then rerun"
             exit 1
         fi
         # Try to create the virtual environment again
-        python3 -m venv venv
-        if [ $? -eq 0 ] && [ -d "venv" ]; then
+        python3 -m venv .venv
+        if [ $? -eq 0 ] && [ -d ".venv" ]; then
             echo "Venv successfully created."
         else
             echo "Failed to create virtual environment even after installing venv. Please check your Python installation."
@@ -51,6 +51,6 @@ if [ ! -d "venv" ]; then
 fi
 
 # Install required Python packages inside a virtual environment
-source venv/bin/activate
+source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt

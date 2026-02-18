@@ -12,7 +12,7 @@ import json5
 with open("config.json5", "r", encoding="utf-8") as f:
     config = json5.load(f)
 
-# Note: in the future, make the config checks hapen on the exicuting line of code, not here. 
+# Note: in the future, make the config checks hapen on the exicuting line of code, not here as this wastes ram.
 force_dark_mode = config["Force dark mode"]
 force_light_mode = config["Force light mode"]
 window_width = config["Window width"]
@@ -85,8 +85,10 @@ class DraggableWindow(QWidget):
             vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
         
         os.environ["vosk_model_dir"] = vosk_model_path
-        print(os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22") + "ruhrggfjnfgfhtrefgtjrfvguyrhfjdvihuytjrfkoiguhty") # Temp line
-        subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
+        if config["Use ydotool"]:
+            subprocess.run(["./nerd-dictation", "begin", "--simulate-input-tool=YDOTOOL"], cwd=os.path.join(script_dir, "nerd-dictation"))
+        else:
+            subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
 
     if window_movable and session_type != "Wayland":
         # Mouse events for dragging

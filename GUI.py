@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# It is recommend to bind this script to a keybind (I recommend Host+H).
+# It is recommend to bind this script to a keybind.
 # If you have any other hotkeys binded to the hotkey you choose, unbind them or set them to a different hotkey.
 # Lookup how to set custom keybinds for your linux distro. 
 
@@ -36,6 +36,7 @@ from linuxosinfo import is_dark_mode # This module does not work on some desktop
 import subprocess
 
 is_dark_mode_real = is_dark_mode() # I know, realy jank
+button_toggled = False
 
 if force_dark_mode:
     is_dark_mode_real = True
@@ -68,27 +69,39 @@ class DraggableWindow(QWidget):
             self.button.setIcon(QIcon("assets/mic_icon_white.png")) # Note: In the future, use SVG icons so they scale better
         else:
             self.button.setIcon(QIcon("assets/mic_icon_black.png")) # Note: In the future, use SVG icons so they scale better
-        self.button.setStyleSheet("QPushButton { padding: 10px; font-size: 16px; }")
+        self.button.setStyleSheet(f"QPushButton {{ padding: 10px; font-size: 16px; background:{background_color_dark};}}" \
+        f"QPushButton::checked{{background:#524783;}}") # fix the hardcodednes
         self.button.clicked.connect(self.run_script)
+        self.button.setCheckable(True)
         layout.addWidget(self.button)
         self.setLayout(layout)
 
         self.old_pos = None
 
     def run_script(self):
-        # Get absolute path to the workspace root
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        if not button_toggled:
+            global button_toggled
+            button_toggled = True
+            # Get absolute path to the workspace root
+            script_dir = os.path.dirname(os.path.abspath(__file__))
 
-        if config["Use punctuation model"]:
-            vosk_model_path = os.path.join(script_dir, "Vosk", "Punctuation models")
-        else:
-            vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
+            if config["Use punctuation model"]:
+                vosk_model_path = os.path.join(script_dir, "Vosk", "Punctuation models")
+            else:
+                vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
         
-        os.environ["vosk_model_dir"] = vosk_model_path
-        if config["Use ydotool"]:
-            subprocess.run(["./nerd-dictation", "begin", "--simulate-input-tool=YDOTOOL"], cwd=os.path.join(script_dir, "nerd-dictation"))
+            os.environ["vosk_model_dir"] = vosk_model_path
+            if config["Use ydotool"]:
+                subprocess.run(["./nerd-dictation", "begin", "--simulate-input-tool=YDOTOOL"], cwd=os.path.join(script_dir, "nerd-dictation"))
+            else:
+                subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
         else:
-            subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
+            global button_toggled # Problem for another day
+            button_toggled = False
+            # Get absolute path to the workspace root
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            subprocess.run(["./nerd-dictation", "end"], cwd=os.path.join(script_dir, "nerd-dictation"))
+            
 
     if window_movable and session_type != "Wayland":
         # Mouse events for dragging

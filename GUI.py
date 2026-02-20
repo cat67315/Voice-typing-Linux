@@ -36,7 +36,7 @@ from linuxosinfo import is_dark_mode # This module does not work on some desktop
 import subprocess
 
 is_dark_mode_real = is_dark_mode() # I know, realy jank
-button_toggled = False
+
 
 if force_dark_mode:
     is_dark_mode_real = True
@@ -73,34 +73,43 @@ class DraggableWindow(QWidget):
         f"QPushButton::checked{{background:#524783;}}") # fix the hardcodednes
         self.button.clicked.connect(self.run_script)
         self.button.setCheckable(True)
+        self.process = None
         layout.addWidget(self.button)
         self.setLayout(layout)
-
         self.old_pos = None
 
     def run_script(self):
-        if not button_toggled:
-            global button_toggled
-            button_toggled = True
-            # Get absolute path to the workspace root
-            script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Use the button checked state (after click) so we don't need a global toggle
+        # and start the long-running `nerd-dictation begin` in the background.
+        script_dir = os.path.dirname(os.path.abspath(__file__))
 
+        if self.button.isChecked():
             if config["Use punctuation model"]:
                 vosk_model_path = os.path.join(script_dir, "Vosk", "Punctuation models")
             else:
                 vosk_model_path = os.path.join(script_dir, "Vosk", "vosk-model-en-us-0.22")
-        
+
             os.environ["vosk_model_dir"] = vosk_model_path
             if config["Use ydotool"]:
-                subprocess.run(["./nerd-dictation", "begin", "--simulate-input-tool=YDOTOOL"], cwd=os.path.join(script_dir, "nerd-dictation"))
+                cmd = ["./nerd-dictation", "begin", "--simulate-input-tool=YDOTOOL"]
             else:
-                subprocess.run(["./nerd-dictation", "begin"], cwd=os.path.join(script_dir, "nerd-dictation"))
+                cmd = ["./nerd-dictation", "begin"]
+
+            # Start as background process so the GUI remains responsive
+            try:
+                self.process = subprocess.Popen(cmd, cwd=os.path.join(script_dir, "nerd-dictation"))
+            except Exception:
+                self.process = None
         else:
-            global button_toggled # Problem for another day
-            button_toggled = False
-            # Get absolute path to the workspace root
-            script_dir = os.path.dirname(os.path.abspath(__file__))
+            # Stop command (runs and returns). Also terminate the background process if still running.
             subprocess.run(["./nerd-dictation", "end"], cwd=os.path.join(script_dir, "nerd-dictation"))
+            if self.process is not None:
+                try:
+                    if self.process.poll() is None:
+                        self.process.terminate()
+                except Exception:
+                    pass
+                self.process = None
             
 
     if window_movable and session_type != "Wayland":

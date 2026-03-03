@@ -12,18 +12,6 @@ import json5
 with open("config.json5", "r", encoding="utf-8") as f:
     config = json5.load(f)
 
-# Note: in the future, make the config checks hapen on the exicuting line of code, not here as this wastes ram.
-force_dark_mode = config["Force dark mode"]
-force_light_mode = config["Force light mode"]
-window_width = config["Window width"]
-window_height = config["Window height"]
-background_color_dark = config["Background color dark mode"]
-background_color_light = config["Background color light mode"]
-button_border_color_dark = config["Button Border color dark mode"]
-button_border_color_light = config["Button Border color light mode"]
-button_border_thickness = config["Button Border thickness"]
-window_movable = config["Window movable"]
-
 if config["Force X11 backend"]:
     os.environ["QT_QPA_PLATFORM"] = "xcb"
     print("Forcing X11 backend for QT")
@@ -38,9 +26,9 @@ import subprocess
 is_dark_mode_real = is_dark_mode() # I know, realy jank
 
 
-if force_dark_mode:
+if config["Force dark mode"]:
     is_dark_mode_real = True
-elif force_light_mode:
+elif config["Force light mode"]:
     is_dark_mode_real = False
 
 session_type = (
@@ -58,19 +46,19 @@ class DraggableWindow(QWidget):
             self.setWindowFlags(Qt.WindowStaysOnTopHint) # Always on top (Dragging is broken with wayland so we have the title bar on wayland)
         else:
             self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint) # Always on top and no tile bar
-        self.setFixedSize(window_width, window_height)  # non-resizable
+        self.setFixedSize(config["Window width"], config["Window height"])  # non-resizable
         if is_dark_mode_real:
-            self.setStyleSheet(f"background-color: {background_color_dark}; border: 2px solid {button_border_color_dark}; border-radius: {button_border_thickness}px;")
+            self.setStyleSheet(f"background-color: {config["Background color dark mode"]}; border: 2px solid {config["Button Border color dark mode"]}; border-radius: {config["Button Border thickness"]}px;")
         else:
-            self.setStyleSheet(f"background-color: {background_color_light}; border: 2px solid {button_border_color_light}; border-radius: {button_border_thickness}px;")
+            self.setStyleSheet(f"background-color: {config["Background color light mode"]}; border: 2px solid {config["Button Border color light mode"]}; border-radius: {config["Button Border thickness"]}px;")
         layout = QVBoxLayout()
         self.button = QPushButton()
         if is_dark_mode_real:
             self.button.setIcon(QIcon("assets/mic_icon_white.png")) # Note: In the future, use SVG icons so they scale better
         else:
             self.button.setIcon(QIcon("assets/mic_icon_black.png")) # Note: In the future, use SVG icons so they scale better
-        self.button.setStyleSheet(f"QPushButton {{ padding: 10px; font-size: 16px; background:{background_color_dark};}}" \
-        f"QPushButton::checked{{background:#524783;}}") # fix the hardcodednes
+        self.button.setStyleSheet(f"QPushButton {{ padding: 10px; font-size: 16px; background:{config["Background color dark mode"]};}}" \
+        f"QPushButton::checked{{background:{config["Button Fill color"]};}}")
         self.button.clicked.connect(self.run_script)
         self.button.setCheckable(True)
         self.process = None
@@ -101,7 +89,7 @@ class DraggableWindow(QWidget):
             except Exception:
                 self.process = None
         else:
-            # Stop command (runs and returns). Also terminate the background process if still running.
+            # Run stop command and terminate the background process if still running.
             subprocess.run(["./nerd-dictation", "end"], cwd=os.path.join(script_dir, "nerd-dictation"))
             if self.process is not None:
                 try:
@@ -112,7 +100,7 @@ class DraggableWindow(QWidget):
                 self.process = None
             
 
-    if window_movable and session_type != "Wayland":
+    if config["Window movable"] and session_type != "Wayland":
         # Mouse events for dragging
         def mousePressEvent(self, event):
             if event.button() == Qt.LeftButton:

@@ -8,6 +8,7 @@
     "Background color light mode": "#f2f2f2", // Background color in hex for light mode
     "Button Border color dark mode": "#555", // Border color in hex for dark mode
     "Button Border color light mode": "#aaa", // Border color in hex for light mode
+    "Button Fill color": "#524783", // Fill color in hex for buttons
     "Button Border thickness": 10, // Thickness of the button border in pixels
     "Window movable": true, // Set to false to disable moving the window (allways off on wayland)
     "Use punctuation model": false, // Set to true to use a model with punctuation (assumes you have downloaded it and put it in the Punctuation models diriectory)
